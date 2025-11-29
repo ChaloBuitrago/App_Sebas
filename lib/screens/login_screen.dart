@@ -40,14 +40,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (role == 'admin') {
       Navigator.pushReplacementNamed(context, '/dashboardAdmin');
+    } else if (role =='cliente') {
+      Navigator.pushReplacementNamed(context, '/dasboardCliente');
     } else {
-      // Ruta cliente NO existe aún → evitar crash
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pantalla de cliente todavía no existe')),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Rol no reconocido')),
       );
     }
-
-  }
 
   @override
   Widget build(BuildContext context) {

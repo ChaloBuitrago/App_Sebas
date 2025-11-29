@@ -53,6 +53,12 @@ class DashboardAdmin extends StatelessWidget {
             ),
             _buildAdminCard(
               context,
+              title: "Cambiar mi contraseña,
+              icon: Icons.lock_reset,
+              route: "/cambiarPassword",
+            ),
+            _buildAdminCard(
+              context,
               title: "Cerrar Sesión",
               icon: Icons.logout,
               route: "/cerrarSesion",

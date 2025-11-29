@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
         "/historialUsuarios": (context) => const HistorialUsuariosScreen(),
         "/pagosPendientes": (context) => const PagosPendientesScreen(),
         "/reportesFinancieros": (context) => const ReportesFinancierosScreen(),
+        '/cambiarPasswor':(_) => const CambiarPasswordScreen(),
         "/addLoan": (context) => const AddLoanScreen(),
         "/loansList": (context) => const AdminLoansList(),
         '/loanDetail': (context) {
