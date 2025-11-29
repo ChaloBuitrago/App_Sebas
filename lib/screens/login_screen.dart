@@ -42,10 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (role == 'admin') {
       Navigator.pushReplacementNamed(context, '/dashboardAdmin');
     } else {
-      // Ruta cliente NO existe aún → evitar crash
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pantalla de cliente todavía no existe')),
-      );
+      Navigator.pushReplacementNamed(context, '/dashboardCliente');
     }
 
   }

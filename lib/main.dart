@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'screens/admin/historial_usuarios_screen.dart';
+import 'screens/admin/gestionar_usuarios_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/dashboard_admin.dart';
+import 'screens/cliente/dashboard_cliente.dart';
 import 'screens/admin/add_user.dart';
 import 'screens/admin/loans/add_loan.dart';
 import 'screens/admin/loans/admin_loans_list.dart';
 import 'screens/admin/loans/loan_detail_screen.dart';
 import 'screens/admin/usuarios/user_detail_screen.dart';
+import 'screens/admin/prestamos_activos_screen.dart';
 import 'screens/admin/reportes/reportes_financieros_screen.dart';
 import 'screens/admin/loans/pagos_pendientes_screen.dart';
 // Si más adelante tendrás listado de usuarios:
@@ -32,10 +34,11 @@ class MyApp extends StatelessWidget {
         "/login": (context) => const LoginScreen(),
         "/dashboardAdmin": (context) => const DashboardAdmin(),
         "/addUser": (context) => const AddUserScreen(),
-        "/historialUsuarios": (context) => const HistorialUsuariosScreen(),
+        "/gestionarUsuarios": (context) => const GestionarUsuariosScreen(),
         "/pagosPendientes": (context) => const PagosPendientesScreen(),
         "/reportesFinancieros": (context) => const ReportesFinancierosScreen(),
         "/addLoan": (context) => const AddLoanScreen(),
+        "dashboardcliente": (context) => const DashboardCliente(),
         "/loansList": (context) => const AdminLoansList(),
         '/loanDetail': (context) {
           final loanId = ModalRoute
