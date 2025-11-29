@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:src/screens/admin/historial_usuarios_screen.dart';
-import 'package:src/screens/login_screen.dart';
+import 'screens/admin/historial_usuarios_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/admin/dashboard_admin.dart';
 import 'screens/admin/add_user.dart';
 import 'screens/admin/loans/add_loan.dart';

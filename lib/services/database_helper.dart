@@ -27,9 +27,14 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
       onConfigure: _onConfigure,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.execute("DROP TABLE IF EXISTS loans");
+        await db.execute("DROP TABLE IF EXISTS usuarios");
+        await _createDB(db, newVersion);
+      },
     );
   }
 
