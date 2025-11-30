@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../services/auth_service.dart';
-import '../../services/user_service.dart';
 
 class ClientePasswordScreen extends StatefulWidget {
   const ClientePasswordScreen({super.key});

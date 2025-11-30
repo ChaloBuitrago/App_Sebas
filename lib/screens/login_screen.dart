@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -41,14 +40,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (role == 'admin') {
       Navigator.pushReplacementNamed(context, '/dashboardAdmin');
-    } else if (role == 'cliente') {
-      Navigator.pushReplacementNamed(context, '/dashboardCliente');
+    } else if (role =='cliente') {
+      Navigator.pushReplacementNamed(context, '/dasboardCliente');
     } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Rol no reconocido')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Rol no reconocido')),
+      );
     }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +121,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
 
 
