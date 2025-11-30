@@ -111,6 +111,18 @@ class DatabaseHelper {
       FOREIGN KEY (userId) REFERENCES usuarios (id)
     );
   ''');
+    await db.execute('''
+    CREATE TABLE prestamos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    monto REAL NOT NULL,
+    fechaInicio TEXT NOT NULL,
+    periodicidad TEXT NOT NULL,
+    tasa REAL NOT NULL,
+    createdAt TEXT,
+    FOREIGN KEY (userId) REFERENCES usuarios(id)
+  );
+''');
 
     // Insertar admin inicial
     await db.insert('usuarios', {
@@ -122,6 +134,7 @@ class DatabaseHelper {
       'role': 'admin',
       'createdAt': DateTime.now().toIso8601String(),
     });
+
   }
 
 

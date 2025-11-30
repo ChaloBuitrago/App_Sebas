@@ -7,25 +7,25 @@ class LoanService {
   /// 🔹 Crear nuevo préstamo
   Future<int> createLoan(Map<String, dynamic> loanData) async {
     final dbClient = await db.database;
-    return await dbClient.insert('loans', loanData);
+    return await dbClient.insert('prestamos', loanData);
   }
 
   /// 🔹 Obtener todos los préstamos (Admin)
   Future<List<Map<String, dynamic>>> getAllLoans() async {
     final dbClient = await db.database;
     return await dbClient.rawQuery('''
-      SELECT loans.*, usuarios.nombre AS userName, usuarios.identifier AS userIdentifier
-      FROM loans
-      INNER JOIN usuarios ON usuarios.id = loans.userId
-      ORDER BY loans.id DESC
+      SELECT prestamos.*, usuarios.nombre AS userName, usuarios.identifier AS userIdentifier
+      FROM prestamos
+      INNER JOIN usuarios ON usuarios.id = prestamos.userId
+      ORDER BY prestamos.id DESC
     ''');
   }
 
-  /// 🔹 Obtener préstamos por usuario
+  /// 🔹 Obtener préstamos por usuario específico
   Future<List<Map<String, dynamic>>> getLoansByUser(int userId) async {
     final dbClient = await db.database;
     return await dbClient.query(
-      'loans',
+      'prestamos',
       where: 'userId = ?',
       whereArgs: [userId],
       orderBy: 'id DESC',
@@ -36,7 +36,7 @@ class LoanService {
   Future<int> updateLoan(int id, Map<String, dynamic> loanData) async {
     final dbClient = await db.database;
     return await dbClient.update(
-      'loans',
+      'prestamos',
       loanData,
       where: 'id = ?',
       whereArgs: [id],
@@ -47,9 +47,10 @@ class LoanService {
   Future<int> deleteLoan(int id) async {
     final dbClient = await db.database;
     return await dbClient.delete(
-      'loans',
+      'prestamos',
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 }
+
