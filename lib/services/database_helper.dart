@@ -27,7 +27,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onConfigure: _onConfigure,
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -91,6 +91,7 @@ class DatabaseHelper {
       nombre TEXT NOT NULL,
       usuario TEXT NOT NULL UNIQUE,
       email TEXT,
+      phone TEXT,
       password TEXT NOT NULL,
       role TEXT NOT NULL,
       createdAt TEXT

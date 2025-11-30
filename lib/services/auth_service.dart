@@ -1,27 +1,37 @@
-import '../models/auth_user.dart';
+import '../models/user_model.dart';
 import 'database_helper.dart';
 
 class AuthService {
-  final dbHelper = DatabaseHelper.instance;
+  final db = DatabaseHelper.instance;
+  UserModel? _currentUser;
 
-  Future<AuthUser?> login(String usuarioOrEmail, String password) async {
-    final db = await dbHelper.database;
+  UserModel? get currentUser => _currentUser;
 
-    final res = await db.query(
+
+  /// 🔹 Iniciar sesión
+  Future<UserModel?> login(String usuario, String password) async {
+    final dbClient = await db.database;
+
+    final res = await dbClient.query(
       'usuarios',
-      where: '(usuario = ? OR email = ?) AND password = ?',
-      whereArgs: [usuarioOrEmail, usuarioOrEmail, password],
-      limit: 1,
+      where: 'usuario = ? AND password = ?',
+      whereArgs: [usuario, password],
     );
 
     if (res.isEmpty) return null;
-    return AuthUser.fromMap(res.first);
+
+    _currentUser = UserModel.fromMap(res.first);
+    return _currentUser;
   }
 
-  Future<int> createUser(AuthUser u) async {
-    final db = await dbHelper.database;
-    return db.insert('usuarios', u.toMap());
+  /// Obtener el usuario actulal
+  Future<UserModel?> getLoggedUser() async {
+    return _currentUser;
+  }
+
+  /// 🔹 Cerrar sesión
+  void logout() {
+    _currentUser = null;
   }
 }
-
 

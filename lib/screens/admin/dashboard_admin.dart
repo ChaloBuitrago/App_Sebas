@@ -37,6 +37,14 @@ class DashboardAdmin extends StatelessWidget {
               route: "/gestionarUsuarios",
             ),
 
+            // 🔵 OPCIÓN PARA CAMBIAR CONTRASEÑA
+            _buildAdminCard(
+              context,
+              title: "Cambiar mi contraseña",
+              icon: Icons.lock_reset,
+              route: "/cambiarPassword",
+            ),
+
             _buildAdminCard(
               context,
               title: "Pagos Pendientes",

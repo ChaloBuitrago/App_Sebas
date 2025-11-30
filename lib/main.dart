@@ -3,6 +3,7 @@ import 'screens/admin/gestionar_usuarios_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/dashboard_admin.dart';
 import 'screens/cliente/dashboard_cliente.dart';
+import 'screens/cambiar_password_screen.dart';
 import 'screens/admin/add_user.dart';
 import 'screens/admin/loans/add_loan.dart';
 import 'screens/admin/loans/admin_loans_list.dart';
@@ -35,10 +36,11 @@ class MyApp extends StatelessWidget {
         "/dashboardAdmin": (context) => const DashboardAdmin(),
         "/addUser": (context) => const AddUserScreen(),
         "/gestionarUsuarios": (context) => const GestionarUsuariosScreen(),
+        "/cambiarPassword": (context) => const CambiarPasswordScreen(),
         "/pagosPendientes": (context) => const PagosPendientesScreen(),
         "/reportesFinancieros": (context) => const ReportesFinancierosScreen(),
         "/addLoan": (context) => const AddLoanScreen(),
-        "dashboardcliente": (context) => const DashboardCliente(),
+        "/dashboardCliente": (context) => const DashboardCliente(),
         "/loansList": (context) => const AdminLoansList(),
         '/loanDetail': (context) {
           final loanId = ModalRoute

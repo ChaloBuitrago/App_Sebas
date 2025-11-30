@@ -41,10 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (role == 'admin') {
       Navigator.pushReplacementNamed(context, '/dashboardAdmin');
-    } else {
+    } else if (role == 'cliente') {
       Navigator.pushReplacementNamed(context, '/dashboardCliente');
+    } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Rol no reconocido')),
+    );
     }
-
   }
 
   @override
@@ -121,5 +124,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 
 
