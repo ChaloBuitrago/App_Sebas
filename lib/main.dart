@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:src/screens/admin/loans/loan_create_screen.dart';
 import 'screens/admin/gestionar_usuarios_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/dashboard_admin.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         "/pagosPendientes": (context) => const PagosPendientesScreen(),
         "/reportesFinancieros": (context) => const ReportesFinancierosScreen(),
         "/prestamosActivos": (context) => const PrestamosActivosScreen(),
+        "/crearPrestamo": (context) => const LoanCreateScreen(),
         '/cambiarPasswor':(_) => const CambiarPasswordScreen(),
         "/addLoan": (context) => const AddLoanScreen(),
         "/dashboardCliente": (context) => const DashboardCliente(),

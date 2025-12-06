@@ -19,6 +19,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   String periodicity = "Mensual";
 
   List<Map<String, dynamic>> users = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -28,7 +29,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
   /// 🔹 Cargar usuarios para el dropdown
   Future<void> cargarUsuarios() async {
-    final result = await UserService().getAllUsers(); // 🔥 CORREGIDO
+    final result = await UserService().getAllUsers(); // ✅ corregido
     setState(() {
       users = result;
     });
@@ -45,18 +46,31 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
       return;
     }
 
+    final amount = double.tryParse(amountController.text);
+    final interest = double.tryParse(interestController.text);
+
+    if (amount == null || interest == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Monto o tasa inválidos")),
+      );
+      return;
+    }
+
     final newLoan = {
       "userId": selectedUserId,
-      "amount": double.parse(amountController.text),
-      "interestRate": double.parse(interestController.text),
+      "amount": amount,
+      "interestRate": interest,
       "startDate": dateController.text,
-      "periodicity": periodicity
+      "periodicity": periodicity,
+      "createdAt": DateTime.now().toIso8601String(),
     };
 
+    setState(() => _isLoading = true);
     await LoanService().createLoan(newLoan);
+    setState(() => _isLoading = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Préstamo creado correctamente")),
+      const SnackBar(content: Text("✅ Préstamo creado correctamente")),
     );
 
     Navigator.pop(context);
@@ -80,7 +94,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               DropdownButtonFormField<int>(
                 value: selectedUserId,
                 items: users.map((u) {
-                  return DropdownMenuItem<int>( // 🔥 CORREGIDO
+                  return DropdownMenuItem<int>(
                     value: u["id"],
                     child: Text("${u["nombre"]} - ${u["identifier"]}"),
                   );
@@ -129,11 +143,26 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
               TextFormField(
                 controller: dateController,
+                readOnly: true,
                 decoration: const InputDecoration(
-                  labelText: "Fecha Inicio (AAAA-MM-DD)",
+                  labelText: "Fecha Inicio",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.calendar_today),
                 ),
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      dateController.text =
+                          pickedDate.toIso8601String().split("T").first;
+                    });
+                  }
+                },
                 validator: (value) =>
                 value!.isEmpty ? "Ingrese una fecha" : null,
               ),
@@ -157,12 +186,14 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               const SizedBox(height: 30),
 
               ElevatedButton(
-                onPressed: guardarPrestamo,
+                onPressed: _isLoading ? null : guardarPrestamo,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   padding: const EdgeInsets.all(16),
                 ),
-                child: const Text(
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
                   "Guardar Préstamo",
                   style: TextStyle(fontSize: 18),
                 ),

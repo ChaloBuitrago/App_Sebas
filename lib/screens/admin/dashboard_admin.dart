@@ -58,6 +58,12 @@ class DashboardAdmin extends StatelessWidget {
               route: "/prestamosActivos",
             ),
             _buildAdminCard(
+                context,
+                title: "Crear Préstamo",
+                icon: Icons.add_card,
+                route: "/crearPrestamo",
+            ),
+            _buildAdminCard(
               context,
               title: "Reportes Financieros",
               icon: Icons.bar_chart,

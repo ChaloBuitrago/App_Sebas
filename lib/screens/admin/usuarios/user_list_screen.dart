@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../services/database_helper.dart';
-import '../../../models/auth_user.dart';
 import 'user_edit_screen.dart';
+import '../loans/loan_create_screen.dart';
 
 class UserListScreen extends StatefulWidget {
+  const UserListScreen({Key? key}) : super(key: key);
+
   @override
   _UserListScreenState createState() => _UserListScreenState();
 }
@@ -19,7 +21,6 @@ class _UserListScreenState extends State<UserListScreen> {
 
   Future<void> cargarUsuarios() async {
     final db = await DatabaseHelper.instance.database;
-
     final data = await db.query("usuarios");
     setState(() => usuarios = data);
   }
@@ -33,32 +34,49 @@ class _UserListScreenState extends State<UserListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Usuarios Registrados")),
-      body: ListView.builder(
+      appBar: AppBar(
+        title: const Text("Usuarios Registrados"),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: usuarios.isEmpty
+          ? const Center(child: Text("No hay usuarios registrados"))
+          : ListView.builder(
         itemCount: usuarios.length,
         itemBuilder: (context, i) {
           final u = usuarios[i];
 
           return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: ListTile(
-              title: Text(u["nombre"]),
+              title: Text(u["nombre"] ?? "Sin nombre"),
               subtitle: Text("Usuario: ${u["usuario"]} · Rol: ${u["role"]}"),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.monetization_on, color: Colors.green),
+                    icon: const Icon(Icons.edit, color: Colors.blueAccent),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => UserEditScreen(user: u["id"]),
+                          builder: (context) => UserEditScreen(user: u['id']), // ✅ corregido
                         ),
                       ).then((_) => cargarUsuarios());
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
+                    icon: const Icon(Icons.attach_money, color: Colors.green),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoanCreateScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => eliminarUsuario(u["id"]),
                   ),
                 ],

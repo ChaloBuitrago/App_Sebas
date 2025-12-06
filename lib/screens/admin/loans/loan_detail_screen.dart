@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../services/loan_service.dart';
 
 class LoanDetailScreen extends StatefulWidget {
   final int loanId;
@@ -13,31 +14,35 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
   Map<String, dynamic>? _loanData;
   bool _isLoading = true;
 
-  // Simulación temporal
-  Future<Map<String, dynamic>> _fetchLoan(int id) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return {
-      "id": id,
-      "user": "Juan Pérez",
-      "amount": 500000,
-      "date": "2024-01-15",
-      "status": "Pendiente",
-      "description": "Préstamo para compra de materiales"
-    };
-  }
-
   @override
   void initState() {
     super.initState();
     _loadLoan();
   }
 
+  /// 🔹 Cargar préstamo desde LoanService
   Future<void> _loadLoan() async {
-    final data = await _fetchLoan(widget.loanId);
+    final data = await LoanService().getLoanById(widget.loanId);
     setState(() {
       _loanData = data;
       _isLoading = false;
     });
+  }
+
+  /// 🔹 Marcar préstamo como pagado
+  Future<void> _markAsPaid() async {
+    if (_loanData == null) return;
+
+    final updatedLoan = Map<String, dynamic>.from(_loanData!);
+    updatedLoan['status'] = 'Pagado';
+
+    await LoanService().updateLoan(widget.loanId, updatedLoan);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("✅ Préstamo marcado como pagado")),
+    );
+
+    _loadLoan(); // recargar datos actualizados
   }
 
   @override
@@ -49,35 +54,39 @@ class _LoanDetailScreenState extends State<LoanDetailScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
+          : _loanData == null
+          ? const Center(child: Text("Préstamo no encontrado"))
           : Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Usuario: ${_loanData!['user']}",
+            Text("Usuario ID: ${_loanData!['userId']}",
                 style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 8),
             Text("Monto: \$${_loanData!['amount']}",
                 style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 8),
-            Text("Fecha: ${_loanData!['date']}",
+            Text("Tasa de interés: ${_loanData!['interestRate']}%",
                 style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 8),
-            Text("Estado: ${_loanData!['status']}",
+            Text("Fecha inicio: ${_loanData!['startDate']}",
                 style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 16),
-            Text("Descripción:",
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(_loanData!['description'],
-                style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 8),
+            Text("Periodicidad: ${_loanData!['periodicity']}",
+                style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 8),
+            Text("Estado: ${_loanData!['status'] ?? 'Pendiente'}",
+                style: const TextStyle(fontSize: 18)),
             const Spacer(),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _loanData!['status'] == 'Pagado'
+                  ? null
+                  : _markAsPaid,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size(double.infinity, 50)),
+                backgroundColor: Colors.green,
+                minimumSize: const Size(double.infinity, 50),
+              ),
               child: const Text("Marcar como pagado"),
             ),
           ],

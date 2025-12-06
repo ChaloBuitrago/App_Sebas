@@ -13,12 +13,27 @@ class LoanService {
   /// 🔹 Obtener todos los préstamos (Admin)
   Future<List<Map<String, dynamic>>> getAllLoans() async {
     final dbClient = await db.database;
-    return await dbClient.rawQuery('''
+    return await dbClient.query('''
       SELECT prestamos.*, usuarios.nombre AS userName, usuarios.identifier AS userIdentifier
       FROM prestamos
       INNER JOIN usuarios ON usuarios.id = prestamos.userId
       ORDER BY prestamos.id DESC
     ''');
+  }
+
+  /// 🔹 Obtener préstamo por ID (con datos del usuario)
+  Future<Map<String, dynamic>?> getLoanById(int id) async {
+    final dbClient = await db.database;
+
+    final result = await dbClient.rawQuery('''
+    SELECT p.*, u.nombre AS userName, u.identifier AS userIdentifier
+    FROM prestamos p
+    INNER JOIN usuarios u ON u.id = p.userId
+    WHERE p.id = ?
+    LIMIT 1
+  ''', [id]);
+
+    return result.isNotEmpty ? result.first : null;
   }
 
   /// 🔹 Obtener préstamos por usuario específico
