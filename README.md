@@ -4,6 +4,60 @@ Aplicación movil desarrollada en Flutter/Dart para llevar la contabilidad acerc
 permitiendo llevar control de los pretamos activos, hacer recordatorios automaticos a los usuarios 
 días antes de la cuota,
 
+###ESTRUCTURA DEL PROYECTO 
+
+ lib/
+    ├── models/                  # Modelos de datos 
+        auth_user.dart
+        historial_model.dart
+        loan_model.dart
+        pago_model.dart
+        prestamo_model.dart
+        user_model.dart
+    ├── screens/                 # Pantallas de la aplicación
+        admin/
+            loans/
+                add_loan.dart
+                admin_loans_list.dart
+                loan_create_screen.dart
+                loan_detail_screen.dart
+                loan_form_screen.dart
+                loans_list_screen.dart
+                pagos_pendientes_screen.dart
+            reportes/
+                reportes_financieros_screen.dart
+            usuarios/
+                user_detail_screen.dart
+                user_edit_screen.dart
+                user_list_screen.dart
+                user_loans_screen.dart
+            dashboard_admin.dart
+            add_user.dart
+            gestionar_usuarios_screen.dart
+            prestamos_activos_screen.dart
+            cerrar_sesion.dart
+            login_admin.dart
+        cliente/
+            cliente_cuentas_screen.dart
+            cliente_password_screen.dart
+            cliente_profile_screen.dart
+            dashboard_cliente.dart
+        cambiar_password_screen.dart
+        login_screen.dart
+    services/                # Lógica de negocio y servicios
+        auth_service.dart
+        loan_service.dart
+        database_helper.dart
+        user_service.dart
+        pago_data.dart
+        prestamo_data.dart
+        session.dart
+        user_data.dart
+        
+    ├── widgets/                 # Componentes reutilizables de UI
+    main.dart                    # Punto de entrada de la aplicación
+
+
 ##Flujos principales 
 
 ### Admin 
@@ -15,8 +69,8 @@ días antes de la cuota,
 - Reportes y Estadísticas > generar reportes financieros
 
 
-### Modulo: Cliente
-- Registro e inicio de sesión > acceso a Home
+### Cliente
+- Registro e inicio de sesión > acceso a Cliente Home
 - Ver Prestamos > lista de prestamos asignados
 - Ver Cuotas > detalle de cuotas pendientes y pagadas
 - Ver Notificaiones > alertas de pagos proximos o pendientes
@@ -28,7 +82,7 @@ días antes de la cuota,
 
 ### Admin 
 - 'dashboard_admin.dart' > vista principal luego de iniciar sesión
-- 
+- ''
 
 ### Dashboard Admin 
 - Agregar Usuario > /addUser > 'add_user.dart'
