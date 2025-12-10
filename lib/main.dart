@@ -13,10 +13,13 @@ import 'screens/admin/usuarios/user_detail_screen.dart';
 import 'screens/admin/prestamos_activos_screen.dart';
 import 'screens/admin/reportes/reportes_financieros_screen.dart';
 import 'screens/admin/loans/pagos_pendientes_screen.dart';
+import 'services/notifications_service.dart';
 // Si más adelante tendrás listado de usuarios:
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().initNotifications();
   runApp(const MyApp());
 }
 

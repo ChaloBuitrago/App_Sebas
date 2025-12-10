@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/loan_service.dart';
 import '../../../services/user_service.dart';
+import '../../../services/notifications_service.dart';
 
 class LoanCreateScreen extends StatefulWidget {
   const LoanCreateScreen({super.key});
@@ -11,11 +12,11 @@ class LoanCreateScreen extends StatefulWidget {
 
 class _LoanCreateScreenState extends State<LoanCreateScreen> {
   final _formKey = GlobalKey<FormState>();
-
   int? selectedUserId;
   final amountController = TextEditingController();
   final interestController = TextEditingController();
   final dateController = TextEditingController();
+  final customMessageController = TextEditingController(); // ✅ nuevo controlador
   String periodicity = "Mensual";
 
   List<Map<String, dynamic>> users = [];
@@ -25,6 +26,16 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   void initState() {
     super.initState();
     cargarUsuarios();
+  }
+
+  /// ✅ Liberar controladores cuando la pantalla se destruye
+  @override
+  void dispose() {
+    amountController.dispose();
+    interestController.dispose();
+    dateController.dispose();
+    customMessageController.dispose(); // liberar memoria
+    super.dispose();
   }
 
   /// 🔹 Cargar usuarios para el dropdown

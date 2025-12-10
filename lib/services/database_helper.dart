@@ -106,6 +106,10 @@ class DatabaseHelper {
       amount REAL NOT NULL,
       interest REAL NOT NULL,
       startDate TEXT NOT NULL,
+      dueDate TEXT,    --fecha limite de pago
+      status TEXT NOT NULL DEFAULT 'active', --pensiente, pagado, vencido
+      periodicidad TEXT NOT NULL, --semanal, quincenal, mensual
+      customMessage TEXT, --mensaje personalizado por el admin
       notes TEXT,
       createdAt TEXT NOT NULL,
       FOREIGN KEY (userId) REFERENCES usuarios (id)
