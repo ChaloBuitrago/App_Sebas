@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/loan_service.dart';
 import '../../../services/user_service.dart';
-import '../../../services/notifications_service.dart';
+import 'loan_notification_service.dart'; // ✅ Import correcto
 
 class LoanCreateScreen extends StatefulWidget {
   const LoanCreateScreen({super.key});
@@ -13,12 +13,14 @@ class LoanCreateScreen extends StatefulWidget {
 class _LoanCreateScreenState extends State<LoanCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   int? selectedUserId;
+
+  // ✅ Controladores
   final amountController = TextEditingController();
   final interestController = TextEditingController();
   final dateController = TextEditingController();
-  final customMessageController = TextEditingController(); // ✅ nuevo controlador
-  String periodicity = "Mensual";
+  final customMessageController = TextEditingController(); // nuevo campo
 
+  String periodicity = "Mensual";
   List<Map<String, dynamic>> users = [];
   bool _isLoading = false;
 
@@ -28,7 +30,6 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
     cargarUsuarios();
   }
 
-  /// ✅ Liberar controladores cuando la pantalla se destruye
   @override
   void dispose() {
     amountController.dispose();
@@ -38,15 +39,30 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
     super.dispose();
   }
 
-  /// 🔹 Cargar usuarios para el dropdown
   Future<void> cargarUsuarios() async {
-    final result = await UserService().getAllUsers(); // ✅ corregido
+    final result = await UserService().getAllUsers();
     setState(() {
       users = result;
     });
   }
 
-  /// 🔹 Guardar préstamo
+  String calcularFechaCuota(String fechaInicio, String periodicity) {
+    final inicio = DateTime.parse(fechaInicio);
+    switch (periodicity) {
+      case "Diario":
+        return inicio.add(const Duration(days: 1)).toIso8601String().split("T").first;
+      case "Semanal":
+        return inicio.add(const Duration(days: 7)).toIso8601String().split("T").first;
+      case "Mensual":
+        return DateTime(inicio.year, inicio.month + 1, inicio.day)
+            .toIso8601String()
+            .split("T")
+            .first;
+      default:
+        return inicio.toIso8601String().split("T").first;
+    }
+  }
+
   Future<void> guardarPrestamo() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -67,18 +83,33 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
       return;
     }
 
+    final fechaInicio = dateController.text;
+    final dueDate = calcularFechaCuota(fechaInicio, periodicity);
+
     final newLoan = {
       "userId": selectedUserId,
       "amount": amount,
       "interestRate": interest,
-      "startDate": dateController.text,
+      "startDate": fechaInicio,
+      "dueDate": dueDate,
+      "status": "pendiente",
       "periodicity": periodicity,
+      "customMessage": customMessageController.text.isNotEmpty
+          ? customMessageController.text
+          : null,
       "createdAt": DateTime.now().toIso8601String(),
     };
 
     setState(() => _isLoading = true);
-    await LoanService().createLoan(newLoan);
+    final loanId = await LoanService().createLoan(newLoan);
     setState(() => _isLoading = false);
+
+    // 🔔 Programar notificaciones usando LoanNotificationService
+    await LoanNotificationService().scheduleReminderNotifications(
+      loanId,
+      newLoan["dueDate"],
+      newLoan["customMessage"],
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("✅ Préstamo creado correctamente")),
@@ -103,7 +134,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               const Text("Usuario", style: TextStyle(fontSize: 16)),
 
               DropdownButtonFormField<int>(
-                value: selectedUserId,
+                initialValue: selectedUserId, // ✅ corregido
                 items: users.map((u) {
                   return DropdownMenuItem<int>(
                     value: u["id"],
@@ -116,10 +147,10 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person)),
-                validator: (value) =>
-                value == null ? "Seleccione un usuario" : null,
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+                validator: (value) => value == null ? "Seleccione un usuario" : null,
               ),
 
               const SizedBox(height: 20),
@@ -132,8 +163,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                   prefixIcon: Icon(Icons.monetization_on),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                value!.isEmpty ? "Ingrese un monto" : null,
+                validator: (value) => value!.isEmpty ? "Ingrese un monto" : null,
               ),
 
               const SizedBox(height: 20),
@@ -146,8 +176,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                   prefixIcon: Icon(Icons.percent),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                value!.isEmpty ? "Ingrese una tasa" : null,
+                validator: (value) => value!.isEmpty ? "Ingrese una tasa" : null,
               ),
 
               const SizedBox(height: 20),
@@ -174,8 +203,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                     });
                   }
                 },
-                validator: (value) =>
-                value!.isEmpty ? "Ingrese una fecha" : null,
+                validator: (value) => value!.isEmpty ? "Ingrese una fecha" : null,
               ),
 
               const SizedBox(height: 20),
@@ -191,6 +219,17 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.repeat),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              TextFormField(
+                controller: customMessageController,
+                decoration: const InputDecoration(
+                  labelText: "Mensaje personalizado (opcional)",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.message),
                 ),
               ),
 

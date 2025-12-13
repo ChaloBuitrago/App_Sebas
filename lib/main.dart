@@ -14,12 +14,19 @@ import 'screens/admin/prestamos_activos_screen.dart';
 import 'screens/admin/reportes/reportes_financieros_screen.dart';
 import 'screens/admin/loans/pagos_pendientes_screen.dart';
 import 'services/notifications_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 // Si más adelante tendrás listado de usuarios:
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().initNotifications();
+
+  // ✅ Pedir permiso en Android 13+
+  if (await Permission.notification.isDenied) {
+    await Permission.notification.request();
+  }
+
   runApp(const MyApp());
 }
 

@@ -1,5 +1,5 @@
-import 'package:sqflite/sqflite.dart';
 import 'database_helper.dart';
+import '../screens/admin/loans/loan_notification_service.dart'; // ✅ Importar servicio de notificaciones
 
 class LoanService {
   final db = DatabaseHelper.instance;
@@ -7,13 +7,22 @@ class LoanService {
   /// 🔹 Crear nuevo préstamo
   Future<int> createLoan(Map<String, dynamic> loanData) async {
     final dbClient = await db.database;
-    return await dbClient.insert('prestamos', loanData);
+    final loanId = await dbClient.insert('prestamos', loanData);
+
+    // 🔔 Programar notificaciones previas al vencimiento
+    await LoanNotificationService().scheduleReminderNotifications(
+      loanId,
+      loanData["dueDate"]?.toString(),        // ✅ conversión segura
+      loanData["customMessage"]?.toString(),  // ✅ conversión segura
+    );
+
+    return loanId;
   }
 
   /// 🔹 Obtener todos los préstamos (Admin)
   Future<List<Map<String, dynamic>>> getAllLoans() async {
     final dbClient = await db.database;
-    return await dbClient.query('''
+    return await dbClient.rawQuery('''
       SELECT prestamos.*, usuarios.nombre AS userName, usuarios.identifier AS userIdentifier
       FROM prestamos
       INNER JOIN usuarios ON usuarios.id = prestamos.userId
@@ -26,12 +35,12 @@ class LoanService {
     final dbClient = await db.database;
 
     final result = await dbClient.rawQuery('''
-    SELECT p.*, u.nombre AS userName, u.identifier AS userIdentifier
-    FROM prestamos p
-    INNER JOIN usuarios u ON u.id = p.userId
-    WHERE p.id = ?
-    LIMIT 1
-  ''', [id]);
+      SELECT p.*, u.nombre AS userName, u.identifier AS userIdentifier
+      FROM prestamos p
+      INNER JOIN usuarios u ON u.id = p.userId
+      WHERE p.id = ?
+      LIMIT 1
+    ''', [id]);
 
     return result.isNotEmpty ? result.first : null;
   }
@@ -50,12 +59,22 @@ class LoanService {
   /// 🔹 Actualizar préstamo
   Future<int> updateLoan(int id, Map<String, dynamic> loanData) async {
     final dbClient = await db.database;
-    return await dbClient.update(
+    final result = await dbClient.update(
       'prestamos',
       loanData,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    // 🔔 Si el estado cambia a moroso → programar notificaciones de mora
+    if (loanData["status"] == "moroso") {
+      await LoanNotificationService().scheduleLateNotifications(
+        id,
+        loanData["customMessage"]?.toString(), // ✅ conversión segura
+      );
+    }
+
+    return result;
   }
 
   /// 🔹 Eliminar préstamo
@@ -68,4 +87,3 @@ class LoanService {
     );
   }
 }
-

@@ -1,7 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
 
 class NotificationService {
   // Singleton
@@ -14,6 +14,9 @@ class NotificationService {
 
   /// 🔹 Inicializar notificaciones
   Future<void> initNotifications() async {
+    // Inicializar zonas horarias
+    tz.initializeTimeZones();
+
     const AndroidInitializationSettings androidInit =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -26,6 +29,11 @@ class NotificationService {
         _onSelectNotification(response.payload);
       },
     );
+
+    // ✅ Pedir permiso en Android 13+
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
   }
 
   /// 🔹 Mostrar notificación inmediata
@@ -35,6 +43,7 @@ class NotificationService {
     AndroidNotificationDetails(
       'default_channel',
       'General Notifications',
+      channelDescription: 'Notificaciones generales de la app',
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -58,6 +67,7 @@ class NotificationService {
     AndroidNotificationDetails(
       'scheduled_channel',
       'Scheduled Notifications',
+      channelDescription: 'Notificaciones programadas de préstamos',
       importance: Importance.high,
       priority: Priority.high,
     );
