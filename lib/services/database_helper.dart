@@ -37,9 +37,9 @@ class DatabaseHelper {
     final db = await database;
 
     return await db.rawQuery('''
-    SELECT p.id, p.monto, p.fecha, p.loanId, u.userName
+    SELECT p.id, p.amount, p.fechaInicio AS fecha, p.loanId, u.nombre AS userName
     FROM prestamos p
-    JOIN usuarios u ON p.usuarioId = u.id
+    JOIN usuarios u ON p.userId = u.id
     WHERE p.estado = ?
   ''', ['pendiente']);
   }

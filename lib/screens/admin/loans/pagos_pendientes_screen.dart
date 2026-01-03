@@ -20,11 +20,19 @@ class _PagosPendientesScreenState extends State<PagosPendientesScreen> {
   }
   Future<void> loadPagosPendientes() async {
     setState(() => loading = true);
-    final data = await DatabaseHelper.instance.getPendingPayments();
-    setState(() {
-      pagos = data;
-      loading = false;
-    });
+    try {
+      final data = await DatabaseHelper.instance.getPendingPayments();
+      setState(() {
+        pagos = data;
+        loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        pagos = [];
+        loading = false;
+      });
+      debugPrint("Error al cargar pagos pendientes: $e");
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -58,12 +66,12 @@ class _PagosPendientesScreenState extends State<PagosPendientesScreen> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     title: Text(
-                      item["userName"],
+                      "Usuario ID: ${item["userId"]}", // usar userId en lugar de userName
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text("Fecha límite: ${item["fecha"]}"),
+                    subtitle: Text("Fecha inicio: ${item["StartDate"]}"),
                     trailing: Text(
-                      "\$${item["monto"]}",
+                      "\$${item["amount"]}", // se usa amount para mostrar el monto
                       style: const TextStyle(
                           color: Colors.red, fontWeight: FontWeight.w600),
                     ),
