@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:src/screens/admin/loans/loan_notification_controller.dart';
+import 'package:src/screens/admin/loans/loan_notification_service.dart';
 import '../../services/auth_service.dart';
 import '../admin/dashboard_admin.dart';
 
@@ -15,6 +17,16 @@ class _LoginAdminScreenState extends State<LoginAdminScreen> {
   bool _isLoading = false;
 
   final AuthService _authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    //Ejecutar logica en segundoplano al abrir la pantalla si es necesario
+    Future.microtask(() async {
+      // lógica: revisar prestamos y programar notificaciones
+      await LoanNotificationController.checkAndScheduleNotifications();
+    });
+  }
 
   Future<void> _login() async {
     setState(() => _isLoading = true);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../services/loan_service.dart';
 import '../../../services/user_service.dart';
 import 'loan_notification_service.dart'; // ✅ Import correcto
+import '../../../services/database_helper.dart';
 
 class LoanCreateScreen extends StatefulWidget {
   const LoanCreateScreen({super.key});
@@ -66,56 +67,35 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   Future<void> guardarPrestamo() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (selectedUserId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Seleccione un usuario")),
-      );
-      return;
-    }
-
-    final amount = double.tryParse(amountController.text);
-    final interest = double.tryParse(interestController.text);
-
-    if (amount == null || interest == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Monto o tasa inválidos")),
-      );
-      return;
-    }
-
-    final fechaInicio = dateController.text;
-    final dueDate = calcularFechaCuota(fechaInicio, periodicity);
-
-    final newLoan = {
-      "userId": selectedUserId,
-      "amount": amount,
-      "interestRate": interest,
-      "startDate": fechaInicio,
-      "dueDate": dueDate,
-      "status": "pendiente",
-      "periodicity": periodicity,
-      "customMessage": customMessageController.text.isNotEmpty
-          ? customMessageController.text
-          : null,
-      "createdAt": DateTime.now().toIso8601String(),
-    };
-
     setState(() => _isLoading = true);
-    final loanId = await LoanService().createLoan(newLoan);
-    setState(() => _isLoading = false);
 
-    // 🔔 Programar notificaciones usando LoanNotificationService
-    await LoanNotificationService().scheduleReminderNotifications(
-      loanId,
-      newLoan["dueDate"],
-      newLoan["customMessage"],
-    );
+    try {
+      final prestamo = {
+        'userId': selectedUserId,
+        'amount': double.parse(amountController.text),
+        'interest': double.parse(interestController.text),
+        'startDate': dateController.text,
+        'periodicidad': periodicity,
+        'customMessage': customMessageController.text,
+        'createdAt': DateTime.now().toIso8601String(),
+      };
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("✅ Préstamo creado correctamente")),
-    );
+      final id = await DatabaseHelper.instance.insertLoan(prestamo);
+      print("✅ Préstamo guardado con id: $id");
 
-    Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Préstamo guardado correctamente")),
+      );
+
+      Navigator.pop(context); // volver a la lista de préstamos
+    } catch (e) {
+      print("❌ Error al guardar préstamo: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error al guardar: $e")),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -227,7 +207,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               TextFormField(
                 controller: customMessageController,
                 decoration: const InputDecoration(
-                  labelText: "Mensaje personalizado (opcional)",
+                  labelText: "Mensaje personalizado (editable por administrador)",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.message),
                 ),

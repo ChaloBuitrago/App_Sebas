@@ -95,6 +95,45 @@ días antes de la cuota,
 - Cerrar Sesión → /cerrarSesion > 'cerrar_sesion.dart'
 
 
+## Diagrama de relaciones
+
+El sistema se organiza en tres tablas principales:
+
+- Usuarios: Información de los clientes.
+- Loans: Prestamos asociados a cada usuario.
+- Prestamos: pagos/cuotas asociadas a cada préstamo.
+
+### Entidad-Relación
+
+Tablas Principales 
+- Usuarios (User)
+    - id (PK)
+    - nombre
+    - email
+    - phone
+    - status
+    - password
+    - role (admin/cliente)
+    - createdAt
+- Loans (Prestamo)
+    - id (PK)
+    - userId (FK a Usuarios.id)
+    - amount (monto del préstamo)
+    - interest (tasa de interés)
+    - startDate (fecha de inicio del préstamo)
+    - status (estado del prestamo: activo, cerrado)
+    - periodicidad (diario, semanal, mensual)
+    - customMessage (mensaje personalizado para recordatorios)
+    - notes (notas adicionales)
+    - createdAt
+- Prestamos 
+    - id (PK)
+    - userId
+    - monto
+    - fechaInicio
+    - periodicidad
+    - tasa
+    - createdAt
 
 
 

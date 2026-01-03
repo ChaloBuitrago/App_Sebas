@@ -65,12 +65,6 @@ class DashboardAdmin extends StatelessWidget {
             ),
             _buildAdminCard(
               context,
-              title: "Reportes Financieros",
-              icon: Icons.bar_chart,
-              route: "/reportesFinancieros",
-            ),
-            _buildAdminCard(
-              context,
               title: "Cerrar Sesión",
               icon: Icons.logout,
               route: "/cerrarSesion",

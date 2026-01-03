@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:src/services/notifications_service.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -16,9 +17,55 @@ class DatabaseHelper {
     return _database!;
   }
 
+  Future<int> insertUser(Map<String, dynamic> user) async {
+    final db = await database;
+    return await db.insert('usuarios', user);
+  }
+
+  Future<Map<String, dynamic>?> getUserByUsername(String username) async {
+    final db = await database;
+
+    final result = await db.query(
+      'usuarios',
+      where: 'usuario = ?',
+      whereArgs: [username],
+    );
+    return result.isNotEmpty ? result.first : null;
+  }
+
+  Future<List<Map<String, dynamic>>> getPendingPayments() async {
+    final db = await database;
+
+    return await db.rawQuery('''
+    SELECT p.id, p.monto, p.fecha, p.loanId, u.userName
+    FROM prestamos p
+    JOIN usuarios u ON p.usuarioId = u.id
+    WHERE p.estado = ?
+  ''', ['pendiente']);
+  }
+
   Future<int> insertLoan(Map<String, dynamic> loan) async {
     final db = await database;
     return await db.insert('loans', loan);
+  }
+
+  Future<int> deleteLoan(int id) async {
+    final db = await database;
+    return await db.delete(
+      'loans',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> updateLoan(int id, Map<String, dynamic> loan) async {
+    final db = await database;
+    return await db.update(
+      'loans',
+      loan,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<Database> _initDB(String fileName) async {
@@ -57,24 +104,70 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> updateLoan(int id, Map<String, dynamic> loan) async {
+  Future<int> updateUser(int id, Map<String, dynamic> user) async {
     final db = await database;
     return await db.update(
-      'loans',
-      loan,
+      'usuarios',
+      user,
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 
-  Future<int> deleteLoan(int id) async {
+  Future<int> deleteUser(int id) async {
     final db = await database;
     return await db.delete(
-      'loans',
+      'usuarios',
       where: 'id = ?',
       whereArgs: [id],
     );
   }
+
+
+
+  Future<List<Map<String, dynamic>>> getLoansForNotifications() async {
+    final db = await database;
+    return await db.query('loans', where: 'status = ?', whereArgs: ['active']);
+  }
+
+  Future<void> checkAndSendNotifications() async {
+    final loans = await DatabaseHelper.instance.getLoansForNotifications();
+
+    for (var loan in loans) {
+      final periodicidad = loan['periodicidad'];
+      final mensaje = loan['customMessage'] ?? "Recuerde su pago de préstamo";
+      final fechaInicio = DateTime.parse(loan['startDate']);
+      final dueDate = loan['dueDate'] != null ? DateTime.parse(loan['dueDate']) : null;
+
+      bool debeNotificar = false;
+
+      switch (periodicidad) {
+        case 'Diario':
+          debeNotificar = true;
+          break;
+        case 'Semanal':
+          debeNotificar = DateTime.now().weekday == fechaInicio.weekday;
+          break;
+        case 'Mensual':
+          debeNotificar = DateTime.now().day == fechaInicio.day;
+          break;
+      }
+
+      // Extra: notificar si está próximo a vencer
+      if (dueDate != null && dueDate.difference(DateTime.now()).inDays <= 2) {
+        debeNotificar = true;
+      }
+
+      if (debeNotificar) {
+        await NotificationService().showNotification(
+          "Recordatorio de préstamo",
+          "$mensaje - Monto: \$${loan['amount']} - Interés: ${loan['interest'] * 100}%",
+        );
+      }
+    }
+  }
+
+
 
 
 
@@ -92,6 +185,7 @@ class DatabaseHelper {
       usuario TEXT NOT NULL UNIQUE,
       email TEXT,
       phone TEXT,
+      status TEXT DEFAULT 'active',
       password TEXT NOT NULL,
       role TEXT NOT NULL,
       createdAt TEXT

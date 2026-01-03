@@ -1,4 +1,4 @@
-package com.andresbuitrago.controlcuentas.src
+package com.andresbuitrago.controlcuentas
 
 import io.flutter.embedding.android.FlutterActivity
 

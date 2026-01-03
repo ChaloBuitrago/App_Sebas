@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.andresbuitrago.controlcuentas.src"
+    namespace = "com.andresbuitrago.controlcuentas"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.andresbuitrago.controlcuentas.src"
+        applicationId = "com.andresbuitrago.controlcuentas" // ✅ corregido
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

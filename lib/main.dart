@@ -15,7 +15,7 @@ import 'screens/admin/reportes/reportes_financieros_screen.dart';
 import 'screens/admin/loans/pagos_pendientes_screen.dart';
 import 'services/notifications_service.dart';
 import 'package:permission_handler/permission_handler.dart';
-// Si más adelante tendrás listado de usuarios:
+import 'screens/admin/loans/loan_notification_controller.dart';
 
 
 void main() async {
@@ -26,7 +26,6 @@ void main() async {
   if (await Permission.notification.isDenied) {
     await Permission.notification.request();
   }
-
   runApp(const MyApp());
 }
 
@@ -49,12 +48,12 @@ class MyApp extends StatelessWidget {
         "/gestionarUsuarios": (context) => const GestionarUsuariosScreen(),
         "/cambiarPassword": (context) => const CambiarPasswordScreen(),
         "/pagosPendientes": (context) => const PagosPendientesScreen(),
-        "/reportesFinancieros": (context) => const ReportesFinancierosScreen(),
         "/prestamosActivos": (context) => const PrestamosActivosScreen(),
         "/crearPrestamo": (context) => const LoanCreateScreen(),
         '/cambiarPasswor':(_) => const CambiarPasswordScreen(),
         "/addLoan": (context) => const AddLoanScreen(),
         "/dashboardCliente": (context) => const DashboardCliente(),
+        "/cerrarSesion": (context) => const LoginScreen(),
         "/loansList": (context) => const AdminLoansList(),
         '/loanDetail': (context) {
           final loanId = ModalRoute
