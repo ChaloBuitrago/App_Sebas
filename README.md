@@ -121,7 +121,7 @@ flutter run
 - Perfil de Usuario > ver y editar informacion personal(incluyendo contraseña)
 - Contacto y Soporte > canal de comunicación con admin. //pendiente para crear
 
-##Pantallas 
+## Pantallas 
 
 ### Admin 
 - 'dashboard_admin.dart' > vista principal luego de iniciar sesión
@@ -195,20 +195,35 @@ Tablas Principales
 ### Agregar Usuario
 ![Agregar Usuario](lib/assets/screenshots/agregar_usuario.png)
 
+
 ## 🛣️ Roadmap
 
-- [x] Corrección de errores en pantallas de Pagos Pendientes y Préstamos Activos
-- [ ] Corrección de errores en cambiar contraseña en el panel administrador
+### 🐞 Errores conocidos
+
+- [ ] Revisar lógica de `database_helper.dart` para evitar duplicados en préstamos
+- [ ] Mejorar manejo de errores en inicio de sesión (pantalla `login_admin.dart`)
+- [ ] Revisar logica de `cambiar_password_screen.dart` para actualizar contraseñas correctamente
+- [ ] Organizar lo titulos de los ultimos dos items del formulario crear préstamo `loan_create_screen.dart`
+- [ ] Organizar el login para los usuarios creados por el administrador `login_screen.dart`
+
+### 🔧 Mejoras pendientes
+
+- [ ] Optimizar tiempos de carga en el arranque de la app
+- [ ] Unificar mensajes de notificación para admins y clientes
+- [ ] Documentar mejor la lógica de recordatorios automáticos
+- [ ] Añadir validaciones de campos en formularios de creación de préstamos
 - [ ] Crear los botones iniciales que tendrá la interfaz de cliente
-- [ ] Organizar lo titulos de los ultimos dos items del formulario crear préstamo
-- [ ] Conectar la base de datos para que el cliente ya pueda ingresar a ver su información luego de ser creado por el admin
-- [ ] Canal de soporte cliente (chat o tickets) // pendiente
-- [ ] Exportación de reportes en PDF/Excel // funcionalidad pendiente($$$)
-- [ ] Multi-idioma (es/en) // pendiente a negociar 
-- [ ] Optimización de tiempos de carga //Hacer si o si antes de lanzar la app
-- [ ] Pruebas unitarias e integración //importante antes de lanzar la app
-- [ ] Integración con servicios en la nube //Proximos
-- [ ] Módulo de pagos en línea // Negociable $$$
+
+
+### 🚀 Nuevas funcionalidades
+
+- [ ] Canal de soporte cliente (chat o tickets)
+- [ ] Exportación de reportes en PDF/Excel
+- [ ] Multi-idioma (es/en)
+- [ ] Integración con servicios en la nube
+- [ ] Módulo de pagos en línea
+
+
 
 
 
