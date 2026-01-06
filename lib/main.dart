@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:src/screens/admin/loans/loan_create_screen.dart';
+import 'package:src/services/database_helper.dart';
 import 'screens/admin/gestionar_usuarios_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin/dashboard_admin.dart';
@@ -14,18 +15,18 @@ import 'screens/admin/prestamos_activos_screen.dart';
 import 'screens/admin/reportes/reportes_financieros_screen.dart';
 import 'screens/admin/loans/pagos_pendientes_screen.dart';
 import 'services/notifications_service.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'screens/admin/loans/loan_notification_controller.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService().initNotifications();
 
-  // ✅ Pedir permiso en Android 13+
-  if (await Permission.notification.isDenied) {
-    await Permission.notification.request();
-  }
+    try {
+      final db = await DatabaseHelper.instance.database;
+      print('[MAIN] ususarios inicializado correctamente' );
+    } catch (e) {
+      print('[MAIN] Error al inicializar usuarios por defecto: $e' );
+    }
+
+  NotificationService().initNotifications(); // sin await
   runApp(const MyApp());
 }
 
@@ -50,7 +51,6 @@ class MyApp extends StatelessWidget {
         "/pagosPendientes": (context) => const PagosPendientesScreen(),
         "/prestamosActivos": (context) => const PrestamosActivosScreen(),
         "/crearPrestamo": (context) => const LoanCreateScreen(),
-        '/cambiarPasswor':(_) => const CambiarPasswordScreen(),
         "/addLoan": (context) => const AddLoanScreen(),
         "/dashboardCliente": (context) => const DashboardCliente(),
         "/cerrarSesion": (context) => const LoginScreen(),

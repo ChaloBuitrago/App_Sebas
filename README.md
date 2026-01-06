@@ -84,6 +84,7 @@ flutter pub get
 flutter run
 
 ## Dependencias principales 
+
 - flutter sdk Framework para desarrollo de la app 
 - flutter_local_notifications: 17.2.1  // Manejo de notificaciones locales(recordatorios)
 - timezone: 0.9.0 // Manejo de zonas horarias para notificaciones
@@ -200,9 +201,9 @@ Tablas Principales
 
 ### 🐞 Errores conocidos
 
-- [ ] Revisar lógica de `database_helper.dart` para evitar duplicados en préstamos
-- [ ] Mejorar manejo de errores en inicio de sesión (pantalla `login_admin.dart`)
-- [ ] Revisar logica de `cambiar_password_screen.dart` para actualizar contraseñas correctamente
+- [x] Revisar lógica de `database_helper.dart` para evitar duplicados en préstamos
+- [] Mejorar manejo de errores en inicio de sesión (pantalla `login_admin.dart`)
+- [] Revisar logica de `cambiar_password_screen.dart` para actualizar contraseñas correctamente
 - [ ] Organizar lo titulos de los ultimos dos items del formulario crear préstamo `loan_create_screen.dart`
 - [ ] Organizar el login para los usuarios creados por el administrador `login_screen.dart`
 
@@ -223,6 +224,37 @@ Tablas Principales
 - [ ] Integración con servicios en la nube
 - [ ] Módulo de pagos en línea
 
+✅ Checklist de pruebas 05/01/2024
+
+🔐 Login
+
+- [x] Login con admin/admin123 abre DashboardAdmin.
+- [x] Login con cliente/cliente123 abre DashboardCliente. //ingresa pero queda cargando pantalla
+- [x] Login con credenciales incorrectas muestra “Credenciales incorrectas”. // funciona bien con admin
+- [x] Logout limpia la sesión y regresa a LoginScreen.
+
+
+👤 Cliente // Aun no puede ingresar con las credenciales que le asigna el administrador (Interfaz pendiente)
+- [ ] Cliente sin préstamos → mensaje “Tu acceso será habilitado cuando el administrador registre tu primer préstamo”.
+- [ ] Cliente con préstamo → se muestran préstamos activos en DashboardCliente.
+- [ ] Cliente puede cambiar su contraseña desde el panel (casilla + botón).
+- [ ] Cliente ve notificaciones programadas por el admin.
+- [ ] Cliente ve historial de pagos asociado a sus préstamos.
+
+👨‍💼 Administrador
+- [x] Admin puede crear un nuevo cliente con credenciales iniciales.
+- [x] Admin puede crear un préstamo para ese cliente.
+- [x] Admin puede programar notificaciones → aparecen en el panel del cliente.
+- [] Admin puede consultar historial de pagos de todos los clientes.
+
+
+
+🗄️ Base de datos
+- [x] usuarios contiene admin y cliente por defecto.
+- [x] usuarios guarda correctamente nuevos clientes creados por admin. // correcto en losta pero no en credenciales
+- [x] prestamos se relaciona con el cliente correcto. // correcto
+- [x] pagos se registran y se muestran en historial. // pendiente de prueba completa 
+- [x] notificaciones se insertan y se muestran en el cliente. // pendiente de prueba completa
 
 
 

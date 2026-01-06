@@ -22,7 +22,6 @@ class _DashboardClienteState extends State<DashboardCliente> {
 
   Future<void> cargarDatosCliente() async {
     final user = await AuthService().getLoggedUser(); // Guardamos sesión luego
-
     if (user == null) return;
 
     final loans = await LoanService().getLoansByUser(user.id!);

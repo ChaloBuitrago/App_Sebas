@@ -1,53 +1,86 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'admin/dashboard_admin.dart';
+import 'cliente/dashboard_cliente.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _userController = TextEditingController();
-  final _passController = TextEditingController();
-  final AuthService _authService = AuthService();
+  final _usuarioController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _authService = AuthService();
+
   bool _loading = false;
 
-  Future<void> _login() async {
-    final user = _userController.text.trim();
-    final pass = _passController.text.trim();
+  @override
+  void initState() {
+    super.initState();
 
-    if (user.isEmpty || pass.isEmpty) {
+    // 👇 Solicitar permisos después de que se muestre la pantalla
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final status = await Permission.notification.status;
+      if (status.isDenied) {
+        await Permission.notification.request();
+      }
+    });
+  }
+
+
+  Future<void> _login() async {
+    //Validación de campos vacios
+    if (_usuarioController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingrese usuario y contraseña')),
+        const SnackBar(content: Text("Complete todos los campos")),
       );
       return;
     }
-
+      // log de Inicio
+    print('[LOGIN] Intentando iniciar sesión para usuario="${_usuarioController.text.trim()}"');
     setState(() => _loading = true);
-    final authUser = await _authService.login(user, pass);
+
+    final user = await _authService.login(
+      _usuarioController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
     setState(() => _loading = false);
 
-    if (authUser == null) {
+    // Log de resultado
+    print('[LOGIN] Resultado: $user');
+
+    if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Credenciales incorrectas')),
+        const SnackBar(content: Text("Credenciales incorrectas")),
       );
       return;
     }
 
-    // Redirigir según rol
-    final role = authUser.role.toLowerCase();
-
-    if (role == 'admin') {
-      Navigator.pushReplacementNamed(context, '/dashboardAdmin');
-    } else if (role == 'cliente') {
-      Navigator.pushReplacementNamed(context, '/dasboardCliente');
+    final r = user.role?.toLowerCase();
+    if (r == 'admin') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardAdmin()),
+      );
+    } else if ( r == 'cliente') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardCliente()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rol no reconocido')),
+        const SnackBar(content: Text("Rol de usuario desconocido")),
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const Icon(Icons.account_circle,
                     size: 90, color: Colors.blueAccent),
-
                 const SizedBox(height: 20),
                 const Text(
                   "Iniciar Sesión",
@@ -85,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
 
                 TextField(
-                  controller: _userController,
+                  controller: _usuarioController,
                   decoration: const InputDecoration(
                     labelText: "Usuario",
                     border: OutlineInputBorder(),
@@ -95,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 15),
 
                 TextField(
-                  controller: _passController,
+                  controller: _passwordController,
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: "Contraseña",
@@ -110,7 +142,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: _loading ? null : _login,
                     child: _loading
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                         : const Text("Ingresar"),
                   ),
                 )

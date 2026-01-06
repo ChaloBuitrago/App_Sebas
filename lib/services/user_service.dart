@@ -33,7 +33,6 @@ class UserService {
   /// Cambiar contraseña
   Future<String> changePassword(int userId, String oldPass, String newPass) async {
     final dbClient = await db.database;
-
     final res = await dbClient.query(
       'usuarios',
       where: "id = ? AND password = ?",
