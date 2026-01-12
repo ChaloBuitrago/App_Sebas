@@ -1,8 +1,12 @@
 import 'database_helper.dart';
 import '../models/user_model.dart';
+import 'auth_service.dart';
 
 class UserService {
   final db = DatabaseHelper.instance;
+
+
+
 
   /// Obtener todos los usuarios (como lista de Map)
   Future<List<Map<String, dynamic>>> getAllUsers() async {
@@ -28,6 +32,35 @@ class UserService {
       where: 'id = ?',
       whereArgs: [user.id],
     );
+  }
+
+  Future<void> updateUserPassword(int userId, String newHashedPassword) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.update(
+      'usuarios',
+      {'password': newHashedPassword},
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+    // Actualiza tambien el usuario en memoria
+    final auth = AuthService();
+    if (auth.currentUser != null && auth.currentUser!.id == userId) {
+      final oldUser = auth.currentUser!;
+      auth.setCurrentUser(
+        UserModel(
+          id: oldUser.id,
+          identifier: oldUser.identifier,
+          nombre: oldUser.nombre,
+            usuario: oldUser.usuario,
+            email: oldUser.email,
+            phone: oldUser.phone,
+            status: oldUser.status,
+            password: newHashedPassword, // 👈 nueva contraseña
+            role: oldUser.role,
+            createdAt: oldUser.createdAt,
+        )
+      );
+    }
   }
 
   /// Cambiar contraseña

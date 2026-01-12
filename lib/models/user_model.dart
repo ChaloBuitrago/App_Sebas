@@ -36,7 +36,7 @@ class UserModel {
       email: map['email']?.toString() ?? '',
       password: map['password']?.toString() ?? '',
       phone: map['phone']?.toString() ?? '',
-      role: map['role']?.toString() ?? '',
+      role: (map['role'] ?? '').toString().toLowerCase().trim(),
       status: map['status']?.toString() ?? 'active', // 👈 valor por defecto
       createdAt: map['createdAt']?.toString() ?? '', // 👈 puede ser vacío
     );

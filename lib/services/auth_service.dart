@@ -5,16 +5,17 @@ import 'database_helper.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthService {
-  final db = DatabaseHelper.instance;
-  UserModel? _currentUser;
+  // Singleton
+  static final AuthService _instance = AuthService._internal();
+  factory AuthService() => _instance;
+  AuthService._internal();
 
+  UserModel? _currentUser;
   UserModel? get currentUser => _currentUser;
 
-  /// Función para encriptar la contraseñas
-  String hashPassword(String password) {
-    return sha256.convert(utf8.encode(password)).toString();
+  void setCurrentUser(UserModel user) {
+    _currentUser = user;
   }
-
 
   /// 🔹 Iniciar sesión
   Future<UserModel?> login(String usuario, String password) async {
@@ -32,25 +33,29 @@ class AuthService {
 
     if (res.isEmpty) return null;
 
-    _currentUser = UserModel.fromMap(res.first);
+    _currentUser = UserModel.fromMap(res.first); // 👈 Guardamos sesión
+    print('[LOGIN] Usuario ${_currentUser!.usuario} con rol="${_currentUser!.role}" ha iniciado sesión.');
     return _currentUser;
   }
+  /// 🔹 Obtener usuario logueado
+  Future<UserModel?> getLoggedUser() async {
+    return _currentUser;
+  }
+  // Cerrar sesión
+  void logout() => _currentUser = null;
 
-  Future<UserModel?> getLoggedUser() async => _currentUser;
-
-
+  /// 🔹 Hashear contraseña
+  String hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString(); // devuelve el hash en hex
+  }
 
   /// Actualizar contraseña en sesión
   void updateCurrentUserPassword(String newPass){
     if (_currentUser != null){
       _currentUser = _currentUser!.copyWith(password: hashPassword(newPass));
     }
-  }
-
-
-  /// 🔹 Cerrar sesión
-  Future<void> logout() async {
-    _currentUser = null;
   }
 }
 

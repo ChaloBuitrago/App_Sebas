@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../screens/login_screen.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
 import '../../services/loan_service.dart';
@@ -14,15 +15,33 @@ class _DashboardClienteState extends State<DashboardCliente> {
   Map<String, dynamic>? userData;
   List<Map<String, dynamic>> prestamos = [];
 
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+    print('[DASHBOARD CLIENTE] initState ejecutado');
     cargarDatosCliente();
   }
 
   Future<void> cargarDatosCliente() async {
     final user = await AuthService().getLoggedUser(); // Guardamos sesión luego
-    if (user == null) return;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Usuario no autenticado, vuelve a iniciar sesión")),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+      return;
+    }
 
     final loans = await LoanService().getLoansByUser(user.id!);
 
@@ -30,13 +49,24 @@ class _DashboardClienteState extends State<DashboardCliente> {
       userData = user.toMap();
       prestamos = loans;
     });
+    print('[DASHBOARD CLIENTE] Datos recibidos: $prestamos');
   }
+
 
   @override
   Widget build(BuildContext context) {
     if (userData == null) {
       return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+              Text("Cargando datos del cliente..."),
+            ],
+          )
+        ),
       );
     }
 
@@ -79,9 +109,25 @@ class _DashboardClienteState extends State<DashboardCliente> {
             ElevatedButton.icon(
               icon: const Icon(Icons.lock_reset),
               label: const Text("Cambiar contraseña"),
-              onPressed: () {
-                Navigator.pushNamed(context, "/cambiarPassword");
-              },
+              onPressed: () async {
+                final nuevaPass = _passwordController.text.trim();
+                if (nuevaPass.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("La nueva contraseña no puede estar vacía")),
+                  );
+                  return;
+                }
+
+                final auth = AuthService();
+                final hashed = auth.hashPassword(nuevaPass);
+
+                await UserService().updateUserPassword(userData!["id"], hashed);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Contraseña actualizada exitosamente")),
+                  );
+                _passwordController.clear();
+                },
             ),
           ],
         ),

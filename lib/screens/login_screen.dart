@@ -51,32 +51,43 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordController.text.trim(),
     );
 
-    setState(() => _loading = false);
+    setState(() => _loading = true);
+    try {
+      final user = await _authService.login(
+        _usuarioController.text.trim(),
+        _passwordController.text.trim(),
+      );
+      setState(() => _loading = false);
 
-    // Log de resultado
-    print('[LOGIN] Resultado: $user');
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Credenciales incorrectas")),
+        );
+        return;
+      }
 
-    if (user == null) {
+      final r = (user.role ?? '').toLowerCase();
+      print('[LOGIN] Usuario ${user.usuario} con rol="$r" ha iniciado sesión.');
+
+      if (r == 'admin') {
+        Navigator.pushReplacement( context,
+          MaterialPageRoute(builder: (_) => const DashboardAdmin()),
+        );
+      } else if ( r == 'cliente') {
+        Navigator.pushReplacement( context,
+          MaterialPageRoute(builder: (_) => const DashboardCliente()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Rol de usuario desconocido")),
+        );
+      }
+
+    } catch (e) {
+      setState(() => _loading = false);
+      print('[LOGIN] Error durante el inicio de sesión: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Credenciales incorrectas")),
-      );
-      return;
-    }
-
-    final r = user.role?.toLowerCase();
-    if (r == 'admin') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const DashboardAdmin()),
-      );
-    } else if ( r == 'cliente') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const DashboardCliente()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Rol de usuario desconocido")),
+        SnackBar(content: Text("Error durante el inicio de sesión: $e")),
       );
     }
   }
