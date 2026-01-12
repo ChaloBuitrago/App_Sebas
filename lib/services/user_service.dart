@@ -5,9 +5,6 @@ import 'auth_service.dart';
 class UserService {
   final db = DatabaseHelper.instance;
 
-
-
-
   /// Obtener todos los usuarios (como lista de Map)
   Future<List<Map<String, dynamic>>> getAllUsers() async {
     final dbClient = await db.database;
@@ -84,5 +81,38 @@ class UserService {
     );
 
     return "ok";
+  }
+
+  //Crear el usuario desde Admin
+  Future<int> createUser({
+    required String nombre,
+    required String usuario,
+    required String email,
+    required String phone,
+    required String plainPassword,
+    required String role, // "cliente" o "admin"
+  })async {
+    final dbClient = await db.database;
+    final auth = AuthService();
+
+    final hashedPassword = auth.hashPassword(plainPassword);
+
+    final userMap = {
+      'identifier': "USR-${DateTime
+          .now()
+          .millisecondsSinceEpoch}",
+      'nombre': nombre,
+      'usuario': usuario,
+      'email': email,
+      'phone': phone,
+      'password': hashedPassword,
+      'status': 'active',
+      'role': role.toLowerCase(),
+      'createdAt': DateTime.now().toIso8601String(),
+    };
+    // insertar en la base de datos
+    final id = await dbClient.insert('usuarios', userMap);
+    print ('[USER SERVICE] Usuario creado con ID=$id y rol="$role"');
+    return id;
   }
 }

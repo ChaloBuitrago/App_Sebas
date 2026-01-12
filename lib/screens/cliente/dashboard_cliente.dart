@@ -74,6 +74,20 @@ class _DashboardClienteState extends State<DashboardCliente> {
       appBar: AppBar(
         title: const Text('Panel del Cliente'),
         backgroundColor: Colors.green,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: "Cerrar sesión",
+            onPressed: () {
+              AuthService().logout(); // Limpiar sesión en memoria
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false, // elimina todo el stack de navegación
+              );
+            }
+          )
+        ],
       ),
 
       body: SingleChildScrollView(

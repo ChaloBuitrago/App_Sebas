@@ -70,12 +70,14 @@ class _LoginScreenState extends State<LoginScreen> {
       print('[LOGIN] Usuario ${user.usuario} con rol="$r" ha iniciado sesión.');
 
       if (r == 'admin') {
-        Navigator.pushReplacement( context,
+        Navigator.pushAndRemoveUntil( context,
           MaterialPageRoute(builder: (_) => const DashboardAdmin()),
+          (Route<dynamic> route) => false,
         );
       } else if ( r == 'cliente') {
-        Navigator.pushReplacement( context,
+        Navigator.pushAndRemoveUntil( context,
           MaterialPageRoute(builder: (_) => const DashboardCliente()),
+          (Route<dynamic> route) => false,
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
