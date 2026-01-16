@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../services/database_helper.dart';
+import 'package:workmanager/workmanager.dart';
+import '../../../models/loan_model.dart';
+import '../../../services/loan_service.dart';
 
 class AddLoanScreen extends StatefulWidget {
   const AddLoanScreen({super.key});
@@ -18,6 +21,13 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _interestController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _userIdController = TextEditingController();
+  final TextEditingController _montoController = TextEditingController();
+  final TextEditingController _fechaInicioController = TextEditingController();
+  final TextEditingController _periodicidadController = TextEditingController();
+  final TextEditingController _tasaController = TextEditingController();
+  final TextEditingController _mensajeController = TextEditingController();
+  final TextEditingController _telefonoController = TextEditingController();
   DateTime? _selectedDate;
 
   @override
@@ -157,15 +167,40 @@ class _AddLoanScreenState extends State<AddLoanScreen> {
               const SizedBox(height: 24),
 
               ElevatedButton(
-                onPressed: _submitLoan,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text(
-                  'Guardar Préstamo',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
+                onPressed: () async {
+                  // 1. Crear el modelo con los datos del formulario
+                  final loan = LoanModel(
+                    userId: int.parse(_userIdController.text),
+                    monto: double.parse(_montoController.text),
+                    fechaInicio: _fechaInicioController.text,
+                    periodicidad: _periodicidadController.text,
+                    tasa: double.parse(_tasaController.text),
+                    mensajeRecordatorio: _mensajeController.text, // nuevo campo
+                  );
+
+                  // 2. Guardar en base de datos (ejemplo con tu LoanService)
+                  await LoanService().createLoan(loan.toMap());
+
+                  // 3. Calcular próxima fecha de recordatorio
+                  final fechaRecordatorio = loan.calcularProximaFecha();
+
+                  // 4. Programar SMS con WorkManager
+                  Workmanager().registerOneOffTask(
+                    "recordatorio_${loan.id ?? DateTime.now().millisecondsSinceEpoch}",
+                    "enviarSms",
+                    inputData: {
+                      "telefono": _telefonoController.text,
+                      "mensaje": loan.mensajeRecordatorio ?? "Recordatorio de tu préstamo",
+                    },
+                    initialDelay: fechaRecordatorio.difference(DateTime.now()),
+                  );
+
+                  // 5. Feedback al admin
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Préstamo guardado y recordatorio programado")),
+                  );
+                },
+                child: const Text("Guardar préstamo"),
               )
             ],
           ),

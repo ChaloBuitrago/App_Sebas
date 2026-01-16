@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:src/services/notifications_service.dart';
 import 'auth_service.dart';
 
 class DatabaseHelper {
@@ -285,13 +284,6 @@ class DatabaseHelper {
       // Extra: notificar si está próximo a vencer
       if (dueDate != null && dueDate.difference(DateTime.now()).inDays <= 2) {
         debeNotificar = true;
-      }
-
-      if (debeNotificar) {
-        await NotificationService().showNotification(
-          "Recordatorio de préstamo",
-          "$mensaje - Monto: \$${loan['amount']} - Interés: ${loan['interest'] * 100}%",
-        );
       }
     }
   }

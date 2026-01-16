@@ -14,10 +14,28 @@ import 'screens/admin/usuarios/user_detail_screen.dart';
 import 'screens/admin/prestamos_activos_screen.dart';
 import 'screens/admin/reportes/reportes_financieros_screen.dart';
 import 'screens/admin/loans/pagos_pendientes_screen.dart';
-import 'services/notifications_service.dart';
+import 'screens/admin/loans/sms_service.dart';
+import 'package:workmanager/workmanager.dart';
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    final phone = inputData?['telefono'];
+    final message = inputData?['mensaje'];
+
+    if (phone != null && message != null) {
+      await SmsService().sendSms(phone, message); // Enviar SMS usando el servicio
+      print('SMS enviado a $phone: $message');
+    }
+    return Future.value(true);
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: true, //poner en false en produccion
+  );
 
     try {
       final db = await DatabaseHelper.instance.database;
@@ -26,7 +44,6 @@ void main() async {
       print('[MAIN] Error al inicializar usuarios por defecto: $e' );
     }
 
-  NotificationService().initNotifications(); // sin await
   runApp(const MyApp());
 }
 

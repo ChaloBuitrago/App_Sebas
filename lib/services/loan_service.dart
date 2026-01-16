@@ -1,5 +1,5 @@
 import 'database_helper.dart';
-import '../screens/admin/loans/loan_notification_service.dart'; // ✅ Importar servicio de notificaciones
+import '../screens/admin/loans/sms_service.dart'; // ✅ Importar servicio de notificaciones
 
 class LoanService {
   final db = DatabaseHelper.instance;
@@ -8,13 +8,6 @@ class LoanService {
   Future<int> createLoan(Map<String, dynamic> loanData) async {
     final dbClient = await db.database;
     final loanId = await dbClient.insert('prestamos', loanData);
-
-    // 🔔 Programar notificaciones previas al vencimiento
-    await LoanNotificationService().scheduleReminderNotifications(
-      loanId,
-      loanData["dueDate"]?.toString(),        // ✅ conversión segura
-      loanData["customMessage"]?.toString(),  // ✅ conversión segura
-    );
 
     return loanId;
   }
@@ -65,14 +58,6 @@ class LoanService {
       where: 'id = ?',
       whereArgs: [id],
     );
-
-    // 🔔 Si el estado cambia a moroso → programar notificaciones de mora
-    if (loanData["status"] == "moroso") {
-      await LoanNotificationService().scheduleLateNotifications(
-        id,
-        loanData["customMessage"]?.toString(), // ✅ conversión segura
-      );
-    }
 
     return result;
   }

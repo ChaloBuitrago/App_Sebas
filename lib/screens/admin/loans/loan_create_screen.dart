@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/loan_service.dart';
 import '../../../services/user_service.dart';
-import 'loan_notification_service.dart'; // ✅ Import correcto
+import 'sms_service.dart'; // ✅ Import correcto
 import '../../../services/database_helper.dart';
 
 class LoanCreateScreen extends StatefulWidget {

@@ -226,16 +226,8 @@ Tablas Principales
 
 ✅ Checklist de pruebas 05/01/2024
 
-🔐 Login
-
-- [x] Login con admin/admin123 abre DashboardAdmin.
-- [x] Login con cliente/cliente123 abre DashboardCliente. //ingresa pero queda cargando pantalla
-- [x] Login con credenciales incorrectas muestra “Credenciales incorrectas”. // funciona bien con admin
-- [x] Logout limpia la sesión y regresa a LoginScreen.
-
 
 👤 Cliente // Aun no puede ingresar con las credenciales que le asigna el administrador (Interfaz pendiente)
-- [ ] Cliente sin préstamos → mensaje “Tu acceso será habilitado cuando el administrador registre tu primer préstamo”.
 - [ ] Cliente con préstamo → se muestran préstamos activos en DashboardCliente.
 - [ ] Cliente puede cambiar su contraseña desde el panel (casilla + botón).
 - [ ] Cliente ve notificaciones programadas por el admin.
@@ -246,8 +238,6 @@ Tablas Principales
 - [x] Admin puede crear un préstamo para ese cliente.
 - [x] Admin puede programar notificaciones → aparecen en el panel del cliente.
 - [] Admin puede consultar historial de pagos de todos los clientes.
-
-
 
 🗄️ Base de datos
 - [x] usuarios contiene admin y cliente por defecto.

@@ -6,6 +6,7 @@ class LoanModel {
   String periodicidad; // diario / semanal / mensual
   double tasa;
   String? createdAt;
+  String? mensajeRecordatorio;
 
   LoanModel({
     this.id,
@@ -15,6 +16,7 @@ class LoanModel {
     required this.periodicidad,
     required this.tasa,
     this.createdAt,
+    this.mensajeRecordatorio,
   });
 
   factory LoanModel.fromMap(Map<String, dynamic> map) {
@@ -26,6 +28,7 @@ class LoanModel {
       periodicidad: map['periodicidad'],
       tasa: map['tasa'],
       createdAt: map['createdAt'],
+      mensajeRecordatorio: map['mensajeRecordatorio'],
     );
   }
 
@@ -38,6 +41,25 @@ class LoanModel {
       'periodicidad': periodicidad,
       'tasa': tasa,
       'createdAt': createdAt,
+      'mensajeRecordatorio': mensajeRecordatorio,
     };
   }
+
+
+
+  DateTime calcularProximaFecha() {
+    DateTime inicio = DateTime.parse(fechaInicio);
+
+    switch (periodicidad.toLowerCase()){
+      case 'diario':
+        return inicio.add(Duration(days: 1));
+      case 'semanal':
+        return inicio.add(Duration(days: 7));
+      case 'mensual':
+        return DateTime(inicio.year, inicio.month + 1, inicio.day);
+      default:
+        return inicio;
+    }
+  }
+
 }
